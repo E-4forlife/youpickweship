@@ -12,9 +12,13 @@ from wtforms import Form, TextField, TextAreaField, validators, StringField, Sub
 
 ############################## CONSTANTS #########################
 # (Saved in user eve account)
+DEBUG = True
 REDIRECT_URI='http://localhost/oauth-callback'
 DEV_API_KEY = (os.environ['DEV_API_KEY'])
 DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
+app = Flask(__name__)
+app.config.from_object(__name__)
+app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
 ######################################################################
 
 security = EsiSecurity(
@@ -31,18 +35,11 @@ security = EsiSecurity(
 '''
 def login():
     app = EsiApp().get_latest_swagger
-#    security = EsiSecurity(
-#        redirect_uri = REDIRECT_URI,
-#        client_id    = DEV_API_KEY,
-#        secret_key   = DEV_API_SECRET_KEY,
-#        headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},)
-
     client = EsiClient(
         retry_requests = False,
         headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},
         security = security
     )
-    print(security.get_auth_uri(state=generate_state(), scopes=[]))
     return(security.get_auth_uri(state=generate_state(), scopes=[]))
 
 # Generate random state for establishing client connection
@@ -71,11 +68,6 @@ def write_to_disk(name, system_options, contract, tax, multibuy):
                'Multibuy:\n{}\n\n'.format(timestamp, name, system_options, contract, tax, multibuy))
     data.close()
 
-DEBUG = True
-app = Flask(__name__)
-app.config.from_object(__name__)
-app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
-
 # Redirects / forces login
 @app.route("/")
 def index():
@@ -88,27 +80,25 @@ def hello():
     eve = {'sso_login': sso_url}
     return render_template('login.html', title='Home', eve=eve)
 
-@app.route('/oauth-callback')
 #This is where the user comes after they log in through SSO
+@app.route('/oauth-callback')
+
 def respond():
     # Gets the code back from from after logging in, this is used to get tokens 
     code = request.args.get('code')
-    print(code)
     tokens = security.auth(code)
     api_info = security.verify()
-    print(api_info['name'])
-    name = api_info['name']
-    session['name'] = name
+    session['name'] = api_info['name']
     return redirect('/shipping')
+
 
 # Shipping Form
 @app.route('/shipping', methods=['GET', 'POST'])
 
 def hello_world():
     form = ReusableForm(request.form)
-    print (session['name'])
     if request.method == 'POST' and form.validate() and form.contract.data == "yes" and form.tax.data == "yes":
-        print("errors:",form.errors)
+        #print("errors:",form.errors)
         name     = session['name']
         system   = form.system_options.data
         contract = form.contract.data
@@ -127,17 +117,18 @@ def hello_world():
         flash('Error: Multibuy length, Multibuy must be between 1 and 10,000 characters')
 
     elif form.contract.data == "no":
-        flash('Error: You must agree to completing the contract to submit this order')
+        flash('Error: You must agree to completing the contract to submit this order.')
 
     elif form.tax.data == "no":
-        flash('Error: You must agree to paying tax and fees to submit this order')
+        flash('Error: You must agree to paying tax and fees to submit this order.')
 
     else:
         print(form.system_options.data)
-        flash('Error: All Fields are Required')
+        flash('Error: All fields are required')
 
     return render_template('shipping.html', form=form, player_name=session['name'])
 
 # How to run: flask run --host=0.0.0.0 --port=80
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+

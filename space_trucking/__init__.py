@@ -1,18 +1,11 @@
-from esipy import EsiApp
-from esipy import EsiClient
-from esipy import EsiSecurity
+from esipy import EsiApp, EsiClient, EsiSecurity
 import json
-from flask import render_template
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template, redirect, session, flash
 import os
-from random import randrange
-from flask import Flask, redirect, session
 import re
-from random import randint
+from random import randint, randrange
 from time import strftime
-from flask import Flask, render_template, flash, request
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, RadioField
-
 
 # The application name is "picnship"
 # This was built following this resource: https://kyria.github.io/EsiPy/examples/sso_login_esipy/
@@ -56,7 +49,6 @@ def login():
 def generate_state():
     return(randrange(100000))
 
-
 class ReusableForm(Form):
 #    name           = session['name']
     system_options = RadioField('system_options',choices=[('h65-he','h65-he'),('p-zmzv','p-zmzv')])
@@ -78,27 +70,6 @@ def write_to_disk(name, system_options, contract, tax, multibuy):
                'Did user agree to pay for the tax and fee?: {}\n'
                'Multibuy:\n{}\n\n'.format(timestamp, name, system_options, contract, tax, multibuy))
     data.close()
-
-## Once Logged in, return the character name and use it for the sheet.
-def get_character_name(callback_code):
-    tokens = security.auth(callback_code)
-    print(tokens, "")
-    api_info = security.verify()
-    print(api_info['name'])
-    return(api_info['name'])
-
-
-''' This fuction does a regex search on the code in the oauth-callback json
-    As far as I know these codes are 22 characters long.
-'''
-def extract_response_code(request):
-    request=str(request)
-    print(request)
- #   print("This is the request: {request}".format(request=str(request))
-    response_code = re.search("(?<=code=).{22}", request)
-    print("Got response code!: %s", response_code)
-    return response_code
-    
 
 DEBUG = True
 app = Flask(__name__)
@@ -167,11 +138,6 @@ def hello_world():
 
     return render_template('shipping.html', form=form, player_name=session['name'])
 
-
-
-#@app.route("/sso/callback", methods=['GET', 'POST'])
-#def sso():
-#    print("hello world")
-
+# How to run: flask run --host=0.0.0.0 --port=80
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)

@@ -1,0 +1,101 @@
+<html>
+  <head>
+     <title>Demo Form</title>
+     <link rel="stylesheet" media="screen" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  </head>
+  <body>
+
+    <div class="container"><br>
+      <center>
+        <h2>Jita Service</h2>
+        <h6>This service will run 3 - 7 times a week depending on demand</h3>
+      </center>
+    </div>
+
+    <div class=container"><br>
+    <div class="row align-items-center justify-content-center">
+    <div class="col-md-4">
+      <form  action="" method="post" role="form">
+        {{ form.csrf }}
+        <div class="form-group">
+
+          <b><label for="name">Hello {{ player_name }} !</label> </b>
+          <input type="text" class="form-control" id="name" name="name" placeholder="">
+            <br>
+
+	  <b><label for="System">What system do you want your deliveries to?</label></b>
+          <br>
+          <input type="radio" id="h65-he" name="system_options" value="h65-he">
+          <label for="h65-he">h65-he</label>
+          <br>
+          <input type="radio" id="p-zmzv" name="system_options" value="p-zmzv">
+          <label for="p-zmzv">p-zmzv</label>
+          <br>
+
+	    <br>
+	  <b><label for="Agree1">Do you agree to complete and pay in full your contract when your items arrive in h65 with in 48 hours?</label></b>
+          <br>
+          <input type="radio" id="contract" name="contract" value="yes">
+          <label for="contract_yes">Yes</label> <br>
+          <input type="radio" id="contract" name="contract" value="no">
+          <label for="contract_no">No</label><br>
+
+	    <br>
+	  <b><label for="Agree1">Do you understand there is a 1100isk per m3 plus 5% tax on good purchased from this service?</label></b>
+          <br>
+          <input type="radio" id="fee" name="tax" value="yes">
+          <label for="tax_yes">Yes</label> <br>
+          <input type="radio" id="fee" name="tax" value="no">
+          <label for="tax_no">No</label><br>
+            <br>
+
+
+          <b><label for="multibuy">Paste the multi buy for the items you would like to buy from Jita. (Directions in bottom of form)</label></b>
+          <textarea class="form-control" rows="4" cols="50" id="multibuy" name="multibuy" placeholder=""></textarea>
+          <br>
+        <b> Step 1 </b> <br><br>
+        <img src="https://pbs.twimg.com/profile_images/1092453930401968129/xn0CkJT6_400x400.jpg">
+        <br>
+        <br>
+        <b> Step 2 </b><br><br>
+        <img src="https://pbs.twimg.com/profile_images/1092454153585082368/QNM6C86g_400x400.jpg">
+        <br>
+	</div>
+        <br>													   
+
+        <center>
+          <button type="submit" class="btn btn-success">Submit</button>
+        </center>
+      </form>
+
+      <br>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+
+        {% for message in messages %}
+            {% if "Error" not in message[1]: %}
+                <div class="alert alert-info">
+                <strong>Success! </strong> {{ message[1] }}
+                </div>
+            {% endif %}
+
+            {% if "Error" in message[1]: %}
+                <div class="alert alert-danger">
+                <strong>Error: </strong> {{ message[1] }}
+                </div>
+            {% endif %}
+        {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    </div>
+    <br>
+    </div>
+    </div>
+  </body>
+</html>
+

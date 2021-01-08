@@ -34,17 +34,29 @@ security = EsiSecurity(
     an order), you can use that code from within to get security tokens from it, using the code below
 '''
 def login():
+# https://login.eveonline.com/v2/oauth/authorize?response_type=code&redirect_uri=http%3A%2F%2Flocalhost%2Foauth-callback&client_id=8cec56539718405e8220d94c607d45cf&state=4081
+# This value is static, except for the state parameter, which can be dynamically generated, you can return this value with a little bit of string
+# manipulation. You will need to change this when the domain changes from "localhost" to what kolby is using for the domain"
     app = EsiApp().get_latest_swagger
     client = EsiClient(
         retry_requests = False,
         headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},
         security = security
     )
-    return(security.get_auth_uri(state=generate_state(), scopes=[]))
+    token = generate_token
+    #print(security.get_auth_uri(state=generate_state(), scopes=[]))
+    return(security.get_auth_uri(state=token, scopes=[]))
 
-# Generate random state for establishing client connection
-def generate_state():
-    return(randrange(100000))
+def generate_token():
+    """Generates a non-guessable OAuth token used as a state for client connection"""
+    chars = ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+    rand = random.SystemRandom()
+    random_string = ''.join(rand.choice(chars) for _ in range(40))
+    return hmac.new(
+        config.SECRET_KEY.encode('utf-8'),
+        random_string.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
 
 class ReusableForm(Form):
 #    name           = session['name']
@@ -68,21 +80,25 @@ def write_to_disk(name, system_options, contract, tax, multibuy):
                'Multibuy:\n{}\n\n'.format(timestamp, name, system_options, contract, tax, multibuy))
     data.close()
 
+
+
+
+
 # Redirects / forces login
 @app.route("/")
 def index():
     return redirect('/login')
 
-@app.route('/login')
 
+@app.route('/login')
 def hello():
     sso_url = login()
     eve = {'sso_login': sso_url}
     return render_template('login.html', title='Home', eve=eve)
 
+
 #This is where the user comes after they log in through SSO
 @app.route('/oauth-callback')
-
 def respond():
     # Gets the code back from from after logging in, this is used to get tokens 
     code = request.args.get('code')
@@ -94,7 +110,6 @@ def respond():
 
 # Shipping Form
 @app.route('/shipping', methods=['GET', 'POST'])
-
 def hello_world():
     form = ReusableForm(request.form)
     if request.method == 'POST' and form.validate() and form.contract.data == "yes" and form.tax.data == "yes":

@@ -1,15 +1,17 @@
 from esipy import EsiApp, EsiClient, EsiSecurity
-import json
 from flask import Flask, request, Response, render_template, redirect, session, flash
-import os
-import re
 from random import randint, randrange
 from time import strftime
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, RadioField
 
-# The application name is "picnship"
-# This was built following this resource: https://kyria.github.io/EsiPy/examples/sso_login_esipy/
+import hashlib
+import random
+import os
+import re
+import json
+import hmac
 
+# This was built following this resource: https://kyria.github.io/EsiPy/examples/sso_login_esipy/
 ############################## CONSTANTS #########################
 # (Saved in user eve account)
 DEBUG = True
@@ -27,6 +29,13 @@ security = EsiSecurity(
     secret_key   = DEV_API_SECRET_KEY,
     headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},)
 
+esiapp = EsiApp().get_latest_swagger
+client = EsiClient(
+    retry_requests = False,
+    headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},
+    security = security
+)
+
 ''' This is the first step, its a log in process for eve SSO, it returns a url for a user to log
     in from. Once a user logs in it will return a response URL that looks like this:
     http://localhost/oauth-callback?code=xKUaKODBeEyo2giHHrc9NQ&state=SomeRandomGeneratedState
@@ -34,17 +43,7 @@ security = EsiSecurity(
     an order), you can use that code from within to get security tokens from it, using the code below
 '''
 def login():
-# https://login.eveonline.com/v2/oauth/authorize?response_type=code&redirect_uri=http%3A%2F%2Flocalhost%2Foauth-callback&client_id=8cec56539718405e8220d94c607d45cf&state=4081
-# This value is static, except for the state parameter, which can be dynamically generated, you can return this value with a little bit of string
-# manipulation. You will need to change this when the domain changes from "localhost" to what kolby is using for the domain"
-    app = EsiApp().get_latest_swagger
-    client = EsiClient(
-        retry_requests = False,
-        headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},
-        security = security
-    )
-    token = generate_token
-    #print(security.get_auth_uri(state=generate_state(), scopes=[]))
+    token = generate_token()
     return(security.get_auth_uri(state=token, scopes=[]))
 
 def generate_token():
@@ -53,7 +52,7 @@ def generate_token():
     rand = random.SystemRandom()
     random_string = ''.join(rand.choice(chars) for _ in range(40))
     return hmac.new(
-        config.SECRET_KEY.encode('utf-8'),
+       app.config['SECRET_KEY'].encode('utf-8'),
         random_string.encode('utf-8'),
         hashlib.sha256
     ).hexdigest()
@@ -79,9 +78,6 @@ def write_to_disk(name, system_options, contract, tax, multibuy):
                'Did user agree to pay for the tax and fee?: {}\n'
                'Multibuy:\n{}\n\n'.format(timestamp, name, system_options, contract, tax, multibuy))
     data.close()
-
-
-
 
 
 # Redirects / forces login

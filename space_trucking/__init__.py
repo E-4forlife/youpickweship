@@ -21,8 +21,10 @@ DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
-sender="doyou.evenlift.umadbro@gmail.com"
-recipient="doyou.evenlift.umadbro@gmail.com"
+#sender="doyou.evenlift.umadbro@gmail.com"
+#recipient="doyou.evenlift.umadbro@gmail.com"
+sender="picnship@gmail.com"
+recipient="picnship@gmail.com"
 ######################################################################
 
 security = EsiSecurity(
@@ -61,7 +63,7 @@ def generate_token():
 
 class ReusableForm(Form):
 #    name           = session['name']
-    system_options = RadioField('system_options',choices=[('h65-he','h65-he'),('p-zmzv','p-zmzv')])
+    system_options = RadioField('system_options',choices=[('ge-8jv','ge-8jv'),('p-zmzv','p-zmzv'),('t5zi-s','t5zi-s')])
     contract       = RadioField('contract',choices=[('yes','yes'),('no','no')])
     tax            = RadioField('tax',choices=[('yes','yes'),('no','no')])
     multibuy       = TextAreaField('multibuy', [validators.Length(min=1, max=10000)])

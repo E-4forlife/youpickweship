@@ -1,11 +1,12 @@
 TODO:
-more clean up
-set up SMS
-set up in docker
-upload to AWS and point DNS
+generate app specific AWS creds and store them
+Set up Docker
+Upload to AWS and point DNS
+Security fixes for version 2
+More clean up for version 2
 
 
-The secrets secrets / environment vars are stored in the gpg secrets file
+The secrets / environment vars are stored in the gpg secrets file
 
 
 Always encrypt the file that contains the application's secrets, you dont want your keys exposed on github.
@@ -32,7 +33,4 @@ After encrypting it does not ask me for a password to decrypt?
 
 https://unix.stackexchange.com/questions/395875/gpg-does-not-ask-for-password
 
-
-
-I will send you the passphrase.
 

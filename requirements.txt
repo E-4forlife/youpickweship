@@ -2,3 +2,4 @@ esipy
 Flask
 flask_wtf
 flask_bootstrap
+boto3

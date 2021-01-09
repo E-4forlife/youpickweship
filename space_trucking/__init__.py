@@ -3,7 +3,7 @@ from flask import Flask, request, Response, render_template, redirect, session, 
 from random import randint, randrange
 from time import strftime
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, RadioField
-
+from . import email
 import hashlib
 import random
 import os
@@ -21,18 +21,20 @@ DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
+sender="doyou.evenlift.umadbro@gmail.com"
+recipient="doyou.evenlift.umadbro@gmail.com"
 ######################################################################
 
 security = EsiSecurity(
     redirect_uri = REDIRECT_URI,
     client_id    = DEV_API_KEY,
     secret_key   = DEV_API_SECRET_KEY,
-    headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},)
+    headers = {'User-Agent': 'picnship@gmail.com'},)
 
 esiapp = EsiApp().get_latest_swagger
 client = EsiClient(
     retry_requests = False,
-    headers = {'User-Agent': 'doyouevenliftumadbro@gmail.com'},
+    headers = {'User-Agent': 'picnship@gmail.com'},
     security = security
 )
 
@@ -68,9 +70,16 @@ def get_time():
     time = strftime("%Y-%m-%d %H:%M")
     return time
 
-def write_to_disk(name, system_options, contract, tax, multibuy):
+def send_email(name, system_options, contract, tax, multibuy):
     data = open('file.log', 'a')
     timestamp = get_time()
+    body_text =('Form submitted at: {}\n <br>'
+               'Character Name: {}\n <br>'
+               'System to ship to: {}\n <br>'
+               'Did user agree to completing contract?: {}\n <br>'
+               'Did user agree to pay for the tax and fee?: {}\n <br>'
+               'Multibuy:\n{}\n\n'.format(timestamp, name, system_options, contract, tax, multibuy))
+
     data.write('Form submitted at: {}\n'
                'Character Name: {}\n'
                'System to ship to: {}\n'
@@ -78,6 +87,8 @@ def write_to_disk(name, system_options, contract, tax, multibuy):
                'Did user agree to pay for the tax and fee?: {}\n'
                'Multibuy:\n{}\n\n'.format(timestamp, name, system_options, contract, tax, multibuy))
     data.close()
+    to_send = email.Email(sender, recipient, body_text)
+    to_send.send()
 
 
 # Redirects / forces login
@@ -116,7 +127,7 @@ def hello_world():
         tax      = form.tax.data
         multibuy = request.form['multibuy']
 
-        write_to_disk(name, system, contract, tax, multibuy)
+        send_email(name, system, contract, tax, multibuy)
         flash('{}, Your order has been submitted.'.format(name))
     
     elif request.method == 'POST' and len(request.form['name']) > 40:

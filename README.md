@@ -34,3 +34,18 @@ After encrypting it does not ask me for a password to decrypt?
 https://unix.stackexchange.com/questions/395875/gpg-does-not-ask-for-password
 
 
+######## AWS CLI ##############
+
+Need to install the AWS CLI tool and log in to ECR from the CLI to ship images to ECR
+
+
+
+
+######### Working with Docker:############
+
+To build new Docker image and ship it to ECR, the url can be found in AWS ecr repo page
+
+docker build -t picnship:latest .
+
+docker tag ${IMAGE ID} {ECR_URL}/picnship:latest
+docker push ${ECR_URL}/picnship:latest

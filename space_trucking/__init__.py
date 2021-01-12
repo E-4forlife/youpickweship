@@ -15,14 +15,12 @@ import hmac
 ############################## CONSTANTS #########################
 # (Saved in user eve account)
 DEBUG = True
-REDIRECT_URI='http://localhost/oauth-callback'
+REDIRECT_URI= (os.environ['REDIRECT_URI'])
 DEV_API_KEY = (os.environ['DEV_API_KEY'])
 DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
-#sender="doyou.evenlift.umadbro@gmail.com"
-#recipient="doyou.evenlift.umadbro@gmail.com"
 sender="picnship@gmail.com"
 recipient="picnship@gmail.com"
 ######################################################################

@@ -1,0 +1,16 @@
+services:
+  picnship:
+    ports:
+      - 80:80
+    image: public.ecr.aws/s2y3w7q8/picnship:latest
+    environment:
+      - PORT=80
+      - DEV_API_KEY=${DEV_API_KEY}
+      - DEV_API_SECRET_KEY=${DEV_API_SECRET_KEY}
+      - ACCESS_KEY=${ACCESS_KEY}
+      - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
+      - APP_SECRET_KEY_2=${APP_SECRET_KEY_2}
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_ENV=${FLASK_ENV}
+      - REDIRECT_URI=${REDIRECT_URI}
+    command: "flask run --host=0.0.0.0 --port=80"

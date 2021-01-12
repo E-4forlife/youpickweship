@@ -60,7 +60,7 @@ def generate_token():
     ).hexdigest()
 
 class ReusableForm(Form):
-#    name           = session['name']
+    name           = session['name']
     system_options = RadioField('system_options',choices=[('ge-8jv','ge-8jv'),('p-zmzv','p-zmzv'),('t5zi-s','t5zi-s')])
     contract       = RadioField('contract',choices=[('yes','yes'),('no','no')])
     tax            = RadioField('tax',choices=[('yes','yes'),('no','no')])
@@ -128,8 +128,11 @@ def shipping():
         tax      = form.tax.data
         multibuy = request.form['multibuy']
 
-        send_email(name, system, contract, tax, multibuy)
-        flash('{}, Your order has been submitted.'.format(name))
+        try:
+            send_email(name, system, contract, tax, multibuy)
+            flash('{}, Your order has been submitted.'.format(name))
+        except:
+            flash('Error: Submission has failed due to emailing error.'.format(name))
     
     elif request.method == 'POST' and len(request.form['name']) > 40:
         print(form.system_options.data)

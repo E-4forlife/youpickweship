@@ -21,8 +21,8 @@ DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
-sender="picnship@gmail.com"
-recipient="picnship@gmail.com"
+sender="doyou.evenlift.umadbro@gmail.com"
+recipient="doyou.evenlift.umadbro@gmail.com"
 ######################################################################
 
 security = EsiSecurity(
@@ -117,11 +117,12 @@ def respond():
 
 # Shipping Form
 @app.route('/shipping', methods=['GET', 'POST'])
-def hello_world():
+def shipping():
     form = ReusableForm(request.form)
-    if request.method == 'POST' and form.validate() and form.contract.data == "yes" and form.tax.data == "yes":
-        #print("errors:",form.errors)
-        name     = session['name']
+    name     = session['name']
+    print(name)
+    if request.method == 'POST' and form.validate() and form.contract.data == "yes" and form.tax.data == "yes" and name:
+        print("errors:",form.errors)
         system   = form.system_options.data
         contract = form.contract.data
         tax      = form.tax.data
@@ -145,6 +146,7 @@ def hello_world():
         flash('Error: You must agree to paying tax and fees to submit this order.')
 
     else:
+        print("errors:",form.errors)
         print(form.system_options.data)
         flash('Error: All fields are required')
 

@@ -9,7 +9,7 @@ class Email(object):
         # Replace recipient@example.com with a "To" address. If your account 
         # is still in the sandbox, this address must be verified.
         self.recipient  = recipient
-        self.aws_region = "us-east-2"
+        self.aws_region = "us-east-1"
         # The character encoding for the email.
         self.charset = "UTF-8"
         # The subject line for the email.

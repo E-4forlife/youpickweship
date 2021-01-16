@@ -21,8 +21,8 @@ DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
-sender="doyou.evenlift.umadbro@gmail.com"
-recipient="doyou.evenlift.umadbro@gmail.com"
+sender="picNship@gmail.com"
+recipient="picNship@gmail.com"
 ######################################################################
 
 security = EsiSecurity(

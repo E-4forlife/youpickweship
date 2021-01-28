@@ -1,8 +1,9 @@
 from esipy import EsiApp, EsiClient, EsiSecurity
-from flask import Flask, request, Response, render_template, redirect, session, flash
+from flask import Flask, request, Response, render_template, redirect, session, flash, copy_current_request_context
 from random import randint, randrange
 from time import strftime
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, RadioField
+from dotenv import load_dotenv
 from . import email
 import hashlib
 import random
@@ -14,13 +15,14 @@ import hmac
 # This was built following this resource: https://kyria.github.io/EsiPy/examples/sso_login_esipy/
 ############################## CONSTANTS #########################
 # (Saved in user eve account)
-DEBUG = True
-REDIRECT_URI= (os.environ['REDIRECT_URI'])
-DEV_API_KEY = (os.environ['DEV_API_KEY'])
-DEV_API_SECRET_KEY = (os.environ['DEV_API_SECRET_KEY'])
+load_dotenv()
+DEBUG = False
+REDIRECT_URI= (os.environ.get('REDIRECT_URI', '/shipping'))
+DEV_API_KEY = (os.environ.get('DEV_API_KEY', 'dhfkljdhfwe'))
+DEV_API_SECRET_KEY = (os.environ.get('DEV_API_SECRET_KEY', 'jhlkejrhehdsklj'))
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config['SECRET_KEY'] = (os.environ['APP_SECRET_KEY_2'])
+app.config['SECRET_KEY'] = (os.environ.get('APP_SECRET_KEY_2', 'kdjsfhkshdf'))
 sender="picNship@gmail.com"
 recipient="picNship@gmail.com"
 ######################################################################
@@ -60,11 +62,14 @@ def generate_token():
     ).hexdigest()
 
 class ReusableForm(Form):
-    name           = session['name']
+    # name           = session['name']
     system_options = RadioField('system_options',choices=[('ge-8jv','ge-8jv'),('p-zmzv','p-zmzv'),('t5zi-s','t5zi-s')])
     contract       = RadioField('contract',choices=[('yes','yes'),('no','no')])
     tax            = RadioField('tax',choices=[('yes','yes'),('no','no')])
     multibuy       = TextAreaField('multibuy', [validators.Length(min=1, max=10000)])
+    
+    def __init__(self):
+        self.name           = session['name']
 
 def get_time():
     time = strftime("%Y-%m-%d %H:%M")
@@ -105,7 +110,7 @@ def hello():
 
 
 #This is where the user comes after they log in through SSO
-@app.route('/oauth-callback')
+@app.route('/oauth-callback/')
 def respond():
     # Gets the code back from from after logging in, this is used to get tokens 
     code = request.args.get('code')
@@ -157,5 +162,5 @@ def shipping():
 
 # How to run: flask run --host=0.0.0.0 --port=80
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run()
 
